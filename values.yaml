@@ -1,0 +1,34 @@
+# Number of pod replicas
+replicaCount: 1
+
+# Container image configuration
+image:
+  repository: nginx
+  tag: "1.24-alpine"
+  pullPolicy: IfNotPresent
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+
+# Resource limits and requests
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+# Welcome page configuration
+welcomePage:
+  title: "Welcome to Kubernetes!"
+  message: "This application was deployed using Helm."
+  backgroundColor: "#f0f0f0"
+
+# Pod labels (in addition to default labels)
+podLabels: {}
+
+# Node selector for pod scheduling
+nodeSelector: {}
