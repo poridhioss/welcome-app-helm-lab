@@ -1,10 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-html
+  name: {{ include "welcome-app.fullname" . }}-html
   labels:
-    app: {{ .Release.Name }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    {{- include "welcome-app.labels" . | nindent 4 }}
 data:
   index.html: |
     <!DOCTYPE html>
@@ -46,7 +45,7 @@ data:
             <div class="info">
                 <strong>Release:</strong> {{ .Release.Name }}<br>
                 <strong>Namespace:</strong> {{ .Release.Namespace }}<br>
-                <strong>Chart Version:</strong> {{ .Chart.Version }}
+                <strong>Chart:</strong> {{ include "welcome-app.chart" . }}
             </div>
         </div>
     </body>

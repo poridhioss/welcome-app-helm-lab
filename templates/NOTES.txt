@@ -1,26 +1,27 @@
-Congratulations! Your welcome-app has been deployed.
+Congratulations! {{ include "welcome-app.fullname" . }} has been deployed.
 
-Release Name: {{ .Release.Name }}
+Chart: {{ include "welcome-app.chart" . }}
+Release: {{ .Release.Name }}
 Namespace: {{ .Release.Namespace }}
+Revision: {{ .Release.Revision }}
 
-To access your application:
+To access our application:
 
-1. Get the application URL:
-{{- if eq .Values.service.type "ClusterIP" }}
-   kubectl port-forward svc/{{ .Release.Name }} 8080:{{ .Values.service.port }}
-   Then open: http://localhost:8080
-{{- else if eq .Values.service.type "NodePort" }}
-   export NODE_PORT=$(kubectl get svc {{ .Release.Name }} -o jsonpath='{.spec.ports[0].nodePort}')
-   export NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}')
-   echo "http://$NODE_IP:$NODE_PORT"
-{{- else if eq .Values.service.type "LoadBalancer" }}
-   NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-   kubectl get svc {{ .Release.Name }} -w
+{{- if .Values.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ (first $host.paths).path }}
+{{- end }}
+{{- else if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "welcome-app.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+  watch kubectl get --namespace {{ .Release.Namespace }} svc {{ include "welcome-app.fullname" . }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "welcome-app.fullname" . }} 8080:{{ .Values.service.port }}
+  Then open: http://localhost:8080
 {{- end }}
 
-2. Verify the deployment:
-   kubectl get pods -l app={{ .Release.Name }}
-   kubectl get svc {{ .Release.Name }}
-
-Chart Version: {{ .Chart.Version }}
-App Version: {{ .Chart.AppVersion }}
+To check the status:
+  kubectl get pods -l "app.kubernetes.io/name={{ include "welcome-app.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -n {{ .Release.Namespace }}

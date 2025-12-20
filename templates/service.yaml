@@ -1,10 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ include "welcome-app.fullname" . }}
   labels:
-    app: {{ .Release.Name }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    {{- include "welcome-app.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -13,4 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: {{ .Release.Name }}
+    {{- include "welcome-app.selectorLabels" . | nindent 4 }}

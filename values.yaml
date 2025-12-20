@@ -1,16 +1,64 @@
+# Name overrides
+nameOverride: ""
+fullnameOverride: ""
+
 # Number of pod replicas
 replicaCount: 1
 
 # Container image configuration
 image:
   repository: nginx
-  tag: "1.24-alpine"
+  tag: ""  # Defaults to Chart.AppVersion
   pullPolicy: IfNotPresent
+
+# Image pull secrets for private registries
+imagePullSecrets: []
+
+# Service Account configuration
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+# Pod annotations and labels
+podAnnotations: {}
+podLabels: {}
+
+# Security context for the pod
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# Security context for the container
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
 # Service configuration
 service:
   type: ClusterIP
   port: 80
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: welcome.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: welcome-tls
+  #    hosts:
+  #      - welcome.local
 
 # Resource limits and requests
 resources:
@@ -21,14 +69,52 @@ resources:
     cpu: 50m
     memory: 64Mi
 
+# Liveness and readiness probes
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+# Autoscaling configuration
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity: {}
+
 # Welcome page configuration
 welcomePage:
   title: "Welcome to Kubernetes!"
   message: "This application was deployed using Helm."
   backgroundColor: "#f0f0f0"
 
-# Pod labels (in addition to default labels)
-podLabels: {}
+# Environment variables
+env: []
+  # - name: MY_VAR
+  #   value: "my-value"
 
-# Node selector for pod scheduling
-nodeSelector: {}
+# Environment variables from secrets/configmaps
+envFrom: []
+  # - configMapRef:
+  #     name: my-config
+  # - secretRef:
+  #     name: my-secret
