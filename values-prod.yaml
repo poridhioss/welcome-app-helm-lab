@@ -1,0 +1,53 @@
+# Production environment values
+replicaCount: 3
+
+image:
+  tag: "1.24-alpine"
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# Production ingress with TLS
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: welcome.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: welcome-tls
+      hosts:
+        - welcome.example.com
+
+# Enable autoscaling for production
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Pod disruption budget (optional - requires PDB template)
+# podDisruptionBudget:
+#   minAvailable: 2
+
+welcomePage:
+  title: "Welcome to Our Service"
+  message: "Production deployment - serving live traffic."
+  backgroundColor: "#d4edda"
+
+env:
+  - name: LOG_LEVEL
+    value: "warn"
+  - name: ENVIRONMENT
+    value: "production"

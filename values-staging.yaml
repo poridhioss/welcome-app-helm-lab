@@ -1,0 +1,38 @@
+# Staging environment values
+replicaCount: 2
+
+image:
+  tag: "1.24-alpine"
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Ingress enabled for testing
+ingress:
+  enabled: true
+  className: "nginx"
+  hosts:
+    - host: welcome-staging.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+autoscaling:
+  enabled: false
+
+welcomePage:
+  title: "Staging Environment"
+  message: "This is the STAGING deployment - for QA testing."
+  backgroundColor: "#fff3cd"
+
+env:
+  - name: LOG_LEVEL
+    value: "info"
+  - name: ENVIRONMENT
+    value: "staging"

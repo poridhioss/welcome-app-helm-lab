@@ -1,0 +1,35 @@
+# Development environment values
+replicaCount: 1
+
+image:
+  tag: "latest"
+  pullPolicy: Always
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+# No ingress in dev - use port-forward
+ingress:
+  enabled: false
+
+# No autoscaling in dev
+autoscaling:
+  enabled: false
+
+# Dev-specific welcome page
+welcomePage:
+  title: "Development Environment"
+  message: "This is the DEV deployment - changes may be unstable."
+  backgroundColor: "#ffe6e6"
+
+# Debug environment variables
+env:
+  - name: LOG_LEVEL
+    value: "debug"
+  - name: ENVIRONMENT
+    value: "development"
